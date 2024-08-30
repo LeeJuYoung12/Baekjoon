@@ -1,52 +1,59 @@
 #include <iostream>
+#include <vector>
 #include <queue>
-#include <stack>
+#include <algorithm>
 
+#define max_n 200004    
+#define prev aaa
 using namespace std;
 
-int N, K, visited[100004], parent[100004];
-stack<int> stk;
-
+int N, K, visited[max_n], prev[max_n];
+vector<int> v;
+void BFS(int _num) {
+    queue<int> q;
+    q.push(_num);
+    visited[_num] = 1;
+    while (q.size()) {           
+        int pos = q.front();
+        q.pop();
+        if (pos == K) {
+            return;
+        }
+        for (int k : {pos + 1, pos - 1, 2 * pos}) {
+            if (k < 0 || k>=max_n) continue;
+            if (!visited[k]) {
+                visited[k] = visited[pos] + 1;
+                prev[k] = pos;                
+                q.push(k);
+            }
+        }
+    }
+    return;
+}
 int main()
 {
-    cin>>N>>K;
-    if(N == K){
-        cout<<0<<'\n';
-        cout<<N;
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    cin >> N >> K;
+    
+    if (N == K) {
+        cout << 0 << '\n';
+        cout << N << '\n';
         return 0;
     }
-    visited[N] = 1;
+    
 
-    queue<int> q;
-    q.push(N);
-    while(q.size()){
-                
-        int now = q.front();
-        q.pop();
-        
-        if(now == K){
-            cout<<visited[now] - 1<<'\n';
-            int t = K;
-            stk.push(K);
-            while(t != N){
-                t = parent[t];
-                stk.push(t);
-                
-            }
-            while(stk.size()){
-                cout<<stk.top()<<' ';
-                stk.pop();
-            }
-        }
-        
-        for(int next:{now-1, now+1, 2*now}){
-            if(next>=0 && next<=100000){
-                if(!visited[next]){
-                    visited[next] = visited[now] + 1;
-                    q.push(next);
-                    parent[next] = now;
-                }
-            }
-        }
+    BFS(N);    
+    for (int i = K; i != N; i = prev[i]) {
+        v.push_back(i);
     }
+    v.push_back(N);
+    reverse(v.begin(), v.end());
+
+    cout << visited[K] - 1 << '\n';
+    for (int i : v) cout << i << ' ';
+ 
+    return 0;
 }
