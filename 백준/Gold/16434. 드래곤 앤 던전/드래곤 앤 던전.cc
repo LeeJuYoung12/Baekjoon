@@ -6,26 +6,23 @@
 
 using namespace std;
 
-long long N, atk, nowHeart, t[123457], a[123457], h[123457];
+long long N, atk, nowHeart, t[123457], a[123457], h[123457], ret;
 
 bool check(long long mid) {
-    long long now = mid; // 현재 체력
-    long long tempAtk = atk; // 현재 공격력
+    long long now = mid, tempAtk = atk;
     for (int i = 0; i < N; i++) {
-        if (t[i] == 1) {  // 몬스터
-            // 몬스터와의 전투에서 공격 횟수를 계산
-            long long attackTimesHero = (h[i] + tempAtk - 1) / tempAtk;  // 영웅이 몬스터를 죽이는데 필요한 공격 횟수
-            long long attackTimesMonster = (attackTimesHero - 1) * a[i];  // 몬스터가 영웅을 때리는 횟수 * 데미지
-
-            if (now - attackTimesMonster <= 0) return false;  // 영웅이 죽으면 false
-            now -= attackTimesMonster;  // 전투 후 체력 계산
+        if (t[i] == 1) {
+            long long cnt = h[i] / tempAtk + (h[i] % tempAtk ? 1 : 0);
+            now -= (cnt - 1) * a[i];            
+            if (now <= 0) return false;
         }
-        else {  // 포션, 회복
-            tempAtk += a[i];  // 공격력 증가
-            now = min(mid, now + h[i]);  // 체력 회복, 최대 체력을 넘지 않도록 조정
+        else {
+            now = min(mid, now + h[i]);
+            tempAtk += a[i];
         }
     }
-    return now > 0;  // 영웅이 살아남았으면 true
+
+    return now > 0;
 }
 
 int main() {
@@ -41,12 +38,14 @@ int main() {
     long long l = 1, r = INF, mid;
     while (l <= r) {
         mid = (l + r) / 2;
-        if (check(mid)) {
+        if (check(mid)) {            
             r = mid - 1;
+            ret = mid;
         }
         else {
             l = mid + 1;
         }
     }
-    cout << l;
+    cout << ret<<"\n";
+
 }
