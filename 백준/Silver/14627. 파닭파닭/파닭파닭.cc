@@ -5,15 +5,26 @@
 
 using namespace std;
 
-long long S, C, L, r, ret, sum;
+long long S, C, L, r, ret , sum;
 vector<long long> v;
 
 bool check(long long mid) {
-    long long cnt = 0;
-    for (int i = 0; i < S; i++) {
+    long long cnt = 0, _sum = 0, temp, i;
+    bool flag = false;
+    for (i = 0; i < S; i++) {
         cnt += v[i] / mid;
+        _sum += v[i] % mid;
+        if (cnt >= C) {
+            flag = true;
+            break;
+        } 
     }
-    return cnt >= C;
+    if (flag) {       
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 int main() {
@@ -40,8 +51,9 @@ int main() {
         }
         else {
             r = mid - 1;
-        }        
+        }
+        
     }
 
-    cout << sum - ret * C << "\n";
+    cout << sum-ret*C << "\n";
 }   
