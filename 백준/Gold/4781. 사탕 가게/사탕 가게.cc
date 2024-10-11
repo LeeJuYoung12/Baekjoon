@@ -4,7 +4,7 @@
 #define INF 1e9
 using namespace std;
 
-int N, M1, M2, C, dp[100004];
+int N, M1, M2, C, dp[10004];
 
 
 int main() {
@@ -16,7 +16,7 @@ int main() {
         
         if (N == 0) break;
         int cost = M1 * 100 + M2;
-        fill(dp, dp + 100004, 0);
+        fill(dp, dp + 10004, 0);
 
         for (int i = 0; i < N; i++) {
             scanf("%d %d.%d", &C, &M1, &M2);
