@@ -15,7 +15,7 @@ int main() {
     cin.tie(0); cout.tie(0);
 
     cin >> N >> M >> K;
-    
+
     // 각 칸에 추가될 양분을 입력받음
     for (int i = 1; i <= N; i++) {
         for (int j = 1; j <= N; j++) {
@@ -29,7 +29,7 @@ int main() {
     for (int i = 1; i <= M; i++) {
         int x, y, z;
         cin >> x >> y >> z;
-        tree[x][y].push_back(z);  // 좌표 (x, y)에 나무 나이 z를 저장
+        tree[x][y].push_back(z);  // 좌표 (y, x)에 나무 나이 z를 저장
     }
 
     // K년 동안 계절 반복
@@ -45,7 +45,8 @@ int main() {
                     if (A[i][j] >= t) {
                         A[i][j] -= t;  // 나무가 양분을 먹음
                         temp.push_back(t + 1);  // 나무가 나이를 먹음
-                    } else {
+                    }
+                    else {
                         die_tree += t / 2;  // 양분이 부족해 죽은 나무
                     }
                 }
