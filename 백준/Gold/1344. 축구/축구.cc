@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cmath>  // sqrt를 사용하기 위해 추가
-#include <iomanip>  // 소수점 출력 형식을 맞추기 위해 추가
 
 using namespace std;
 
@@ -44,5 +43,5 @@ int main() {
     double result = 1.0 - (outputA * outputB);
 
     // 소수점 6자리까지 출력
-    cout << fixed << setprecision(6) << result << "\n";
+    printf("%.6lf", result);
 }
