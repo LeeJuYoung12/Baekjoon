@@ -1,24 +1,29 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#define INF 1e9
+#include <queue>
+#include <cstring>
+#define INF 987654321
 using namespace std;
 
-int N, K, dp[100004], temp;
-
+int n, k, temp, dp[10004], ret;
+vector<int> v;
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0); cout.tie(0);
-
-    cin >> N >> K;
-
     dp[0] = 1;
-    for (int i = 0; i < N; i++) {
+    cin >> n >> k;
+    for (int i = 0; i < n; i++) {
         cin >> temp;
-        for (int j = temp; j <= K; j++) {
-            dp[j] += (dp[j - temp]);
+        v.push_back(temp);
+    }
+    
+    for (int i = 0; i < n; i++) {
+        for (int j = v[i]; j <= k; j++) {
+            dp[j] += dp[j - v[i]];
         }
     }
-    cout << dp[K];
+    cout << dp[k];
 }
+
