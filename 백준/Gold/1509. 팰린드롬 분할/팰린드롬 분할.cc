@@ -1,60 +1,41 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
+#include <algorithm>
 #include <cstring>
+#define INF 987654321
 using namespace std;
 
 string str;
-int dp[2504][2504];  // 팰린드롬 여부 저장
-int minCut[2504];    // 최소 분할 횟수 저장
+int N, M, S, E, temp, dp[2504][2504], dp2[2504];
 
-// 팰린드롬 여부를 확인하는 함수
-int go(int l, int r) {
-    if (l > r) return 1;
-
-    int& ret = dp[l][r];
-    if (ret != -1) return ret;
-
-    if (str[l] != str[r]) return ret = 0;
-
-    if (l == r) return ret = 1;
-    else return ret = go(l + 1, r - 1);
+int go(int idx) {
+    if (idx == str.length()) return 0;
+    if (dp2[idx] != INF) return dp2[idx];
+    int& ret = dp2[idx];
+    for (int i = 1; idx + i <= str.length(); i++) {
+        if (dp[idx][i]) ret = min(ret, go(idx + i) + 1);
+    }
+    return ret;
 }
 
+
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(0); cout.tie(0);
-
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    fill(dp2, dp2 + 2504, INF);
     cin >> str;
-    int n = str.length();
 
-    // dp 배열을 -1로 초기화
-    memset(dp, -1, sizeof(dp));
-
-    // 팰린드롬 여부 미리 계산
-    for (int i = 0; i < n; i++) {
-        for (int j = i; j < n; j++) {
-            go(i, j);
+    for (int i = 0; i < str.length(); i++) {
+        dp[i][1] = 1;
+    }
+    for (int i = 0; i < str.length()-1; i++) {
+        if (str[i] == str[i + 1]) dp[i][2] = 1;
+    }
+    for (int s = 3; s <= str.length(); s++) {
+        for (int i = 0; i + s <= str.length();i++) {
+            if (str[i] == str[i + s -1] && dp[i+1][s-2]) dp[i][s] = 1;
         }
     }
-
-    // 최소 분할 횟수 계산
-    for (int i = 0; i < n; i++) {
-        // 전체 구간이 팰린드롬이면 분할 횟수는 1
-        if (go(0, i)) {
-            minCut[i] = 1;
-        } else {
-            minCut[i] = 1e9; // 매우 큰 값으로 초기화
-            for (int j = 0; j < i; j++) {
-                if (go(j + 1, i)) { // j+1부터 i까지가 팰린드롬인 경우
-                    minCut[i] = min(minCut[i], minCut[j] + 1);
-                }
-            }
-        }
-    }
-
-    // 결과 출력 (최소 분할 횟수)
-    cout << minCut[n - 1] << "\n";
-
-    return 0;
+    
+    cout << go(0) << "\n";      
 }
