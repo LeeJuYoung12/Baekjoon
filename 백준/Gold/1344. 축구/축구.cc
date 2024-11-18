@@ -1,47 +1,57 @@
 #include <iostream>
-#include <cmath>  // sqrt를 사용하기 위해 추가
-
+#include <vector>
+#include <algorithm>
+#include <cstring>
+#define INF 987654321
 using namespace std;
 
-int a, b;
-double outputA, outputB, err = 1e-6;
+int A, B, arr[20];// 0이 아니면 소수.
+double a, b, dp1[20][20], dp2[20][20], ret;
 
-bool isPrime2(int n) {
-    if (n <= 1) return false;  // 1 이하의 수는 소수가 아님
-    for (int i = 2; i <= sqrt(n); i++) {  // 2부터 n의 제곱근까지 검사
-        if (n % i == 0) {  // i가 n의 약수라면 소수가 아님
-            return false;
-        }
+
+double go(int idx, int goal, double per) {
+    if (idx == 18) {
+        return (arr[goal] == 0) ? 1 : 0;
     }
-    return true;  // 소수일 경우 true
+    double& ret = dp1[idx][goal];
+    if (ret >= -0.5) return ret;
+
+    return ret = go(idx + 1, goal + 1, per) * per + go(idx + 1, goal, per) * (1 - per);
+}
+double go2(int idx, int goal, double per) {
+    if (idx == 18) {
+        return (arr[goal] == 0) ? 1 : 0;
+    }
+    double& ret = dp2[idx][goal];
+    if (ret >= -0.5) return ret;
+
+    return ret = go2(idx + 1, goal + 1, per) * per + go2(idx + 1, goal, per) * (1 - per);
 }
 
-void go(double per, double &output, double ret, int cnt, int goal) {
-    if (cnt == 18) {
-        if (!isPrime2(goal)) {  // 소수가 아닐 때만 결과에 더함
-            output += ret;
+void era(int mx) {
+    fill(arr, arr + 20, 1);
+    arr[0] = 0, arr[1] = 0;
+    for (int i = 2; i <= mx; i++) {
+        if (arr[i] == 0) {
+            continue;
         }
-        return;
+        for (int j = 2 * i; j <= mx; j += i) {
+            arr[j] = 0;
+        }
     }
-
-    go(per, output, ret*per, cnt+1, goal +1);  // 성공한 경우
-    go(per, output, ret * (1-per), cnt + 1, goal);  // 실패한 경우
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(0); cout.tie(0);
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    memset(dp1, -1, sizeof(dp1));
+    memset(dp2, -1, sizeof(dp2));
+    era(20);
+    
+    cin >> A >> B;
+    a = A * 0.01;
+    b = B * 0.01;
 
-    cin >> a >> b;
-
-    double perA = a * 0.01;  // a를 백분율에서 소수로 변환
-    double perB = b * 0.01;  // b를 백분율에서 소수로 변환
-
-    go(perA, outputA, 1.0, 0, 0);  // a의 확률로 계산
-    go(perB, outputB, 1.0, 0, 0);  // b의 확률로 계산
-
-    double result = 1.0 - (outputA * outputB);
-
-    // 소수점 6자리까지 출력
-    printf("%.6lf", result);
+    ret = 1 - (go(0, 0, a) * go2(0, 0, b));
+    printf("%.6f", ret);
 }
