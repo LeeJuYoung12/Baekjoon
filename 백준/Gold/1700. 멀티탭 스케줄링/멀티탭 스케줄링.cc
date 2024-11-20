@@ -1,49 +1,48 @@
 #include <iostream>
-#include <algorithm>
-#include <queue>
 #include <vector>
+#include <algorithm>
+#include <cstring>
+#include <map>
+#include <queue>
 #define INF 987654321
 using namespace std;
 
-long long N, K, arr[104], visited[104];
-long long ret;
-vector<long> v;
+int N, K, arr[104], cnt[104], ret;
+vector<int> v;
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0); cout.tie(0);
 
-int main()
-{
-	ios_base::sync_with_stdio(false);
-	cin.tie(0); cout.tie(0);
-	
-	cin >> N >> K;
-	for (int i = 0; i < K; i++) cin >> arr[i];
-	for (int i = 0; i < K; i++) {
-		if (!visited[arr[i]]) {
-			if (v.size() == N) {
-				int last_idx = 0, pos;
-				for (int _a : v) {
-					int here_pick = INF;
-					for (int j = i + 1; j < K; j++) {
-						if (_a == arr[j]) {
-							here_pick = j;
-							break;
-						}
-					}
-					if (last_idx < here_pick) {
-						last_idx = here_pick;
-						pos = _a;
-					}
-				}
+    cin >> N >> K;
+    for (int i = 0; i < K; i++) {
+        cin >> arr[i];
+    }
 
-				visited[pos] = 0;
-				ret++;
-				v.erase(find(v.begin(), v.end(), pos));
+    for (int i = 0; i < K; i++) {
+        if (!cnt[arr[i]]) {
+            if (v.size() == N) {
+                int last = 0, pos;
+                for (int _a : v) {
+                    int here = INF;
+                    for (int j = i + 1; j < K; j++) {
+                        if (_a == arr[j]) {
+                            here = j;
+                            break;
+                        }
+                    }
+                    if (last < here) {
+                        last = here;
+                        pos = _a;
+                    }
+                }
+                cnt[pos] = 0;
+                ret++;
+                v.erase(find(v.begin(), v.end(), pos));
+            }
 
-
-			}
-			v.push_back(arr[i]);
-			visited[arr[i]] = 1;
-		}	
-	}
-	cout << ret;
-
+            v.push_back(arr[i]);
+            cnt[arr[i]] = 1;
+        }
+    }
+    cout << ret;
 }
