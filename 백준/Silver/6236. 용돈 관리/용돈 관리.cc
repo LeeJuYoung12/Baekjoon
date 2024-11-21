@@ -2,32 +2,27 @@
 #include <vector>
 #include <algorithm>
 #include <cstring>
-#define INF 1987654321
-
+#include <map>
+#include <queue>
+#define INF 987654321
 using namespace std;
 
-long long N, M, arr[100004], l, r, mid, ret;
+int N, M, K, A[100004], l, r, mid, ret;
 
 bool check(int mid) {
-    int cnt = 1;
-    int num = mid;
+    int sum = 0, cnt = 1;
     for (int i = 0; i < N; i++) {
-        if (num - arr[i]>=0) {
-            num -= arr[i];
-        }
-        else {
-            num = mid;
+        if (A[i] > mid) return false;
+        
+        if (sum + A[i] > mid) {
+            sum = 0;
             cnt++;
-            if (num - arr[i] < 0) {
-                return false;
-            }
-            else {
-                num -= arr[i];
-            }
         }
+        
+        sum += A[i];
     }
 
-    return M >= cnt;
+    return cnt <= M;
 }
 
 int main() {
@@ -36,24 +31,20 @@ int main() {
 
     cin >> N >> M;
     for (int i = 0; i < N; i++) {
-        cin >> arr[i];
-        r += arr[i];
+        cin >> A[i];
+        r += A[i];
     }
-    
     ret = r;
-
     while (l <= r) {
-        
         mid = (l + r) / 2;
         if (check(mid)) {
-            ret = min(ret, mid);
             r = mid - 1;
+            ret = min(ret, mid);
         }
         else {
             l = mid + 1;
         }
     }
-    
-   
-    cout << ret << "\n";
+
+    cout << ret << '\n';
 }
