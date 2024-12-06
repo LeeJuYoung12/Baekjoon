@@ -2,62 +2,61 @@
 #include <vector>
 #include <algorithm>
 #include <cstring>
-#define size 1000001  // N의 최대 크기보다 1 크게 설정
+#include <map>
+#define INF 987654321
+#define y1 AAA
 using namespace std;
 
-long long N, M, w, x, y, x2, y2, c, A[1030][1030], tree[1030][1030];
+long long N, M, A[1025][1025], tree[1025][1025], w, x1, y1, c, x2, y2;
 
-long long sum(int idx, int row) {
-    long long ret = 0;
-    while (idx > 0) {
-        ret += tree[row][idx];
-        idx -= (idx & -idx);
+void update(int y, int x, int val) {
+    while (y <= N) {
+        int j = x;
+        while (j <= N) {
+            tree[y][j] += val;
+            j += (j & -j);
+        }
+        y += (y & -y);
     }
-    return ret;
 }
 
-void update(int idx, int row, long long val) {
-    while (idx <= N) {
-        tree[row][idx] += val;
-        idx += (idx & -idx);
+long long sum(int y, int x) {
+    long long ret = 0;
+    while (y > 0) {
+        int j = x;
+        while (j > 0) {
+            ret += tree[y][j];
+            j -= (j & -j);
+        }
+        y -= (y & -y);
     }
+    return ret;
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0); cout.tie(0);
-    
+
     cin >> N >> M;
+
     for (int i = 1; i <= N; i++) {
         for (int j = 1; j <= N; j++) {
             cin >> A[i][j];
-            update(j, i, A[i][j]);
+            update(i, j, A[i][j]);
         }
     }
 
     for (int i = 0; i < M; i++) {
         cin >> w;
-        if (w == 0) {
-            //(x, y)를 c로
-            cin >> y >> x >> c;
-            long long temp = c - A[y][x];
-            A[y][x] = c;
-            update(x, y, temp);
+        if (w == 0) {//(x1,y1) to c
+            cin >> y1 >> x1 >> c;
+            long long diff = c - A[y1][x1];
+            A[y1][x1] = c;
+            update(y1, x1, diff);
         }
-        else {
-            //(x,y) ~ (x2, y2)합
-            cin >> y >> x >> y2 >> x2;
-            long long ret = 0;
-            for (int j = y; j <= y2; j++) {
-                if (x == 0) {
-                    ret += sum(x2, j);
-                }
-                else {
-                    ret += (sum(x2, j) - sum(x - 1, j));
-                }
-            }
-            cout << ret << "\n";
+        else {//(x2,y2) ~ (x1, y1) sum
+            cin >> y1 >> x1 >> y2 >> x2;
+            cout << sum(y2, x2) - sum(y2, x1-1) - sum(y1-1, x2) + sum(y1-1, x1-1) << "\n";
         }
     }
-
 }
