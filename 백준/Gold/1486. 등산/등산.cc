@@ -1,70 +1,72 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#include <cmath>
+#include <algorithm>
+#include <cstring>
+#include <map>
 #define INF 987654321
+#define y1 AAA
 using namespace std;
 
-int N, M, T, D, A[30][30], b[3000][3000], ret;
-string str;
+int N, M, T, D, mountain[30][30], dist[3000][3000], ret;
 int dy[] = { -1, 0, 1, 0 };
 int dx[] = { 0, -1, 0, 1 };
 vector<int> v;
+string str;
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0); cout.tie(0);
+    fill(&dist[0][0], &dist[0][0] + 3000 * 3000, INF);
 
     cin >> N >> M >> T >> D;
+
     for (int i = 0; i < N; i++) {
         cin >> str;
-        for (int j = 0; j < M; j++) {            
+        for (int j = 0; j < M; j++) {
             if (str[j] >= 'A' && str[j] <= 'Z') {
-                A[i][j] = str[j] - 'A';
+                mountain[i][j] = str[j] - 'A';
             }
             else {
-                A[i][j] = str[j] - 'a' + 26;
-            }
+                mountain[i][j] = 26 + str[j] - 'a';
+            }            
         }
     }
-    ret = A[0][0];
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
             v.push_back(i * 100 + j);
         }
     }
-    fill(&b[0][0], &b[0][0] + 3000 * 3000, INF);
 
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
-            for (int d = 0; d < 4; d++) {
-                int ny = i + dy[d];
-                int nx = j + dx[d];
+            for (int k = 0; k < 4; k++) {
+                int ny = i + dy[k];
+                int nx = j + dx[k];
                 if (ny < 0 || nx < 0 || ny >= N || nx >= M) continue;
-                int height_diff = abs(A[i][j] - A[ny][nx]);
-                if (height_diff <= T) {
-                    if (A[ny][nx] > A[i][j]) {
-                        b[i * 100 + j][ny * 100 + nx] = height_diff * height_diff;
+                if (abs(mountain[i][j] - mountain[ny][nx]) <= T) {
+                    if (mountain[i][j] - mountain[ny][nx] >= 0) {
+                        dist[100 * i + j][100 * ny + nx] = 1;
                     }
                     else {
-                        b[i * 100 + j][ny * 100 + nx] = 1;
+                        dist[100 * i + j][100 * ny + nx] = (mountain[ny][nx] - mountain[i][j]) * (mountain[ny][nx] - mountain[i][j]);
                     }
+                }               
+            }
+        }
+    }
+    for (int k:v) {
+        for (int i : v) {
+            for (int j : v) {
+                if (dist[i][k] != INF && dist[k][j] != INF) {
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
                 }
             }
         }
     }
-
-    for (int k : v) {
-        for (int i : v) {
-            for (int j : v) {
-                b[i][j] = min(b[i][j], b[i][k] + b[k][j]);
-            }
-        }
-    }
-
-    for (int i : v) {
-        if (D >= b[0][i] + b[i][0]) {
-            ret = max(ret, A[i / 100][i % 100]);
-        }
+    ret = mountain[0][0];
+    for (int i: v) {
+        if (dist[0][i] + dist[i][0] <= D) {
+            ret = max(ret, mountain[i / 100][i%100]);
+         }
     }
     cout << ret << "\n";
 }
