@@ -1,67 +1,68 @@
 #include <iostream>
+#include <cstring>
 #include <vector>
-#include <algorithm>
-#include <cstring> // memset 사용을 위해 추가
-
+#define INF 987654321
 using namespace std;
 
-int N, M, cnt, maxSize = 0, delMaxSize = 0, arr[54][54], visited[54][54];
+int N, M, arr[54][54], cnt, maxS, bigRet,visited[54][54], compSize[2504];
 int dy[] = { 0, -1, 0, 1 };
 int dx[] = { -1, 0, 1, 0 };
 
-int DFS(int y, int x) {
-    
+
+int DFS(int y, int x, int idx) {
+
     int ret = 1;
-    visited[y][x] = 1;
+    visited[y][x] = idx;
 
     for (int i = 0; i < 4; i++) {
         int ny = y + dy[i];
         int nx = x + dx[i];
+        if (ny < 0 || nx < 0 || ny >= M || nx >= N || visited[ny][nx]) continue;
         if (arr[y][x] & (1 << i)) continue;
-        if (ny < 0 || ny >= M || nx < 0 || nx >= N || visited[ny][nx]) continue;
-
-        ret += DFS(ny, nx);
+        ret += DFS(ny, nx, idx);
     }
     return ret;
 }
 
-int main()
-{
+int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0); cout.tie(0);
-
+    cin.tie(0);
+    
     cin >> N >> M;
     for (int i = 0; i < M; i++) {
         for (int j = 0; j < N; j++) {
             cin >> arr[i][j];
         }
     }
-
-    // 1. 방의 개수와 최대 방 크기 구하기
+   
     for (int i = 0; i < M; i++) {
         for (int j = 0; j < N; j++) {
-            if (!visited[i][j]) {           
-                maxSize = max(maxSize, DFS(i, j));
-                cnt++;  // 방의 개수 증가
+            if (!visited[i][j]) {
+                cnt++;
+                compSize[cnt] = DFS(i, j, cnt);
+                maxS = max(maxS, compSize[cnt]);
             }
         }
     }
 
     for (int i = 0; i < M; i++) {
         for (int j = 0; j < N; j++) {
-            for (int k = 0; k < 4; k++) {
-                if (arr[i][j] & (1 << k)) {
-                    fill(&visited[0][0], &visited[0][0] + 54 * 54, 0);
-                    arr[i][j] -= (1 << k);
-                    delMaxSize = max(delMaxSize, DFS(i, j));
-                    arr[i][j] += (1 << k);
+            if (i + 1 < M) {
+                int a = visited[i][j];
+                int b = visited[i + 1][j];
+                if (a != b) {
+                    bigRet = max(bigRet, compSize[a] + compSize[b]);
+                }
+            }
+            if (j + 1 < N) {
+                int a = visited[i][j];
+                int b = visited[i][j + 1];
+                if (a != b) {
+                    bigRet = max(bigRet, compSize[a] + compSize[b]);
                 }
             }
         }
     }
 
-    // 출력
-    cout << cnt << '\n';         
-    cout << maxSize << '\n';
-    cout << delMaxSize << '\n';
+    cout << cnt << '\n' << maxS << '\n' << bigRet << '\n';
 }
