@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstring>
+#include <string>
+#include <vector>
 #include <algorithm>
 #define INF 987654321
 using namespace std;
@@ -24,28 +26,10 @@ void go(int y, int x, int cnt, int s) {
     }
 }
 
-void checkOtherShapes(int y, int x) {
-    // "ㅗ", "ㅜ", "ㅏ", "ㅓ" 모양 계산
-    for (int i = 0; i < 4; i++) {
-        int temp = arr[y][x];
-        bool valid = true;
-        for (int j = 0; j < 3; j++) {
-            int ny = y + dy[(i + j) % 4];
-            int nx = x + dx[(i + j) % 4];
-            if (ny < 0 || nx < 0 || ny >= N || nx >= M) {
-                valid = false;
-                break;
-            }
-            temp += arr[ny][nx];
-        }
-        if (valid) ret = max(ret, temp);
-    }
-}
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
-    
+
     cin >> N >> M;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
@@ -53,7 +37,7 @@ int main() {
         }
     }
 
-    // DFS를 이용한 "ㄴ", "ㄱ", "ㅁ" 등 모양 처리
+    // DFS로 테트로미노 탐색
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
             visited[i][j] = 1;
@@ -62,13 +46,27 @@ int main() {
         }
     }
 
-    // "ㅗ", "ㅜ", "ㅏ", "ㅓ" 모양 처리
+    // "ㅗ" 모양 탐색
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
-            checkOtherShapes(i, j);
+            if (i >= 1 && i < N - 1 && j >= 1) { // "ㅓ"
+                int temp = arr[i][j] + arr[i - 1][j] + arr[i + 1][j] + arr[i][j - 1];
+                ret = max(ret, temp);
+            }
+            if (i >= 1 && i < N - 1 && j < M - 1) { // "ㅏ"
+                int temp = arr[i][j] + arr[i - 1][j] + arr[i + 1][j] + arr[i][j + 1];
+                ret = max(ret, temp);
+            }
+            if (j >= 1 && j < M - 1 && i >= 1) { // "ㅗ"
+                int temp = arr[i][j] + arr[i][j - 1] + arr[i][j + 1] + arr[i - 1][j];
+                ret = max(ret, temp);
+            }
+            if (j >= 1 && j < M - 1 && i < N - 1) { // "ㅜ"
+                int temp = arr[i][j] + arr[i][j - 1] + arr[i][j + 1] + arr[i + 1][j];
+                ret = max(ret, temp);
+            }
         }
     }
 
     cout << ret << '\n';
-    return 0;
 }
