@@ -1,76 +1,19 @@
 #include <iostream>
 #include <cstring>
-#include <algorithm>
 #include <vector>
+#include <cstring>
 #include <queue>
+#include <algorithm>
+#define INF 987654321
 using namespace std;
 
-int R, C, swanY, swanX, day, visited[1504][1504], visited_Swan[1504][1504];
+int dy[] = { -1,0,1,0 };
+int dx[] = { 0,-1,0,1 };
+
+int R, C, visited[1504][1504], visited2[1504][1504], d;
 char arr[1504][1504];
-
-queue<pair<int, int>> q_Water, q_Swan;
-queue<pair<int, int>> temp_Swan, temp_Water;
-
-int dy[] = { -1, 0, 1, 0 };
-int dx[] = { 0, -1, 0, 1 };
-
-void Qclear(queue<pair<int, int>>& q) {
-    queue<pair<int, int>> empty;
-    swap(q, empty);
-}
-
-void water_melt() {
-
-
-    while (q_Water.size()) {
-        int y = q_Water.front().first;
-        int x = q_Water.front().second;
-        q_Water.pop();
-
-        for (int i = 0; i < 4; i++) {
-            int ny = y + dy[i];
-            int nx = x + dx[i];
-            if (ny < 0 || ny >= R || nx < 0 || nx >= C || visited[ny][nx]) continue;
-
-            if (arr[ny][nx] == 'X') {
-                temp_Water.push({ ny, nx });
-                visited[ny][nx] = 1;
-                arr[ny][nx] = '.';
-            }
-
-        }
-    }
-}
-
-
-bool move_swan() {
-
-    while (q_Swan.size()) {
-        int y = q_Swan.front().first;
-        int x = q_Swan.front().second;
-        q_Swan.pop();
-
-        for (int i = 0; i < 4; i++) {
-            int ny = y + dy[i];
-            int nx = x + dx[i];
-            if (ny < 0 || ny >= R || nx < 0 || nx >= C || visited_Swan[ny][nx]) continue;
-            if (arr[ny][nx] == '.') {
-                q_Swan.push({ ny, nx });
-                visited_Swan[ny][nx] = 1;
-            }
-            else if (arr[ny][nx] == 'L') {
-                return true;
-            }
-            else if (arr[ny][nx] == 'X') {
-                temp_Swan.push({ ny, nx });
-                visited_Swan[ny][nx] = 1;
-            }
-
-        }
-    }
-    return false;
-}
-
+vector<pair<int, int>> beak;
+queue<pair<int, int>> q, posQ;
 
 int main() {
     ios_base::sync_with_stdio(false);
@@ -81,30 +24,67 @@ int main() {
         for (int j = 0; j < C; j++) {
             cin >> arr[i][j];
             if (arr[i][j] == 'L') {
-                swanY = i;
-                swanX = j;
+                beak.push_back({ i, j });
+                q.push({ i, j });
+                visited[i][j] = 1;
             }
-            if (arr[i][j] == '.' || arr[i][j] == 'L') {
-                q_Water.push({ i, j });
+            else if (arr[i][j] == '.') {
+                q.push({ i, j });
                 visited[i][j] = 1;
             }
         }
     }
 
-    q_Swan.push({ swanY, swanX });
-    visited_Swan[swanY][swanX] = 1;
+    posQ.push({ beak[0].first, beak[0].second});
+    visited2[beak[0].first][beak[0].second] = 1;
 
-    while (true) {
-        if (move_swan()) break;
-        water_melt();
-        q_Water = temp_Water;
-        q_Swan = temp_Swan;
-        Qclear(temp_Water);
-        Qclear(temp_Swan);
-        day++;
+    while (1) {
+        //check
+        queue<pair<int, int>> tempPos;
+        while (!posQ.empty()) {
+            int y = posQ.front().first;
+            int x = posQ.front().second;
+            posQ.pop();
+
+            for (int i = 0; i < 4; i++) {
+                int ny = y + dy[i];
+                int nx = x + dx[i];
+
+                if (ny < 0 || nx < 0 || ny >= R || nx >= C || visited2[ny][nx]) continue;
+
+                visited2[ny][nx] = true;
+
+                if (arr[ny][nx] == 'L') {
+                    cout << d << '\n';
+                    return 0;
+                }
+
+                if (arr[ny][nx] == '.') posQ.push({ ny, nx });
+                else tempPos.push({ ny, nx }); // 얼음이면 다음 탐색을 위해 저장
+            }
+        }
+        posQ = tempPos; // 다음 날 이동할 백조 큐
+        
+        //water
+        queue<pair<int, int>> tempwater;
+        while (!q.empty()) {
+            int y = q.front().first;
+            int x = q.front().second;
+            q.pop();
+
+            for (int i = 0; i < 4; i++) {
+                int ny = y + dy[i];
+                int nx = x + dx[i];
+
+                if (ny < 0 || nx < 0 || ny >= R || nx >= C || visited[ny][nx]) continue;
+
+                visited[ny][nx] = true;
+                arr[ny][nx] = '.';
+                tempwater.push({ ny, nx });
+            }
+        }
+        q = tempwater; // 다음 날 확장할 물 큐
+
+        d++;
     }
-
-    cout << day << '\n';
-
-    return 0;
 }
