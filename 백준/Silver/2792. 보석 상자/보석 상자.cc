@@ -1,41 +1,43 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
 #include <cstring>
-#define INF 1987654321
+#include <vector>
+#include <cstring>
+#include <queue>
+#include <algorithm>
+#define INF 987654321
 using namespace std;
 
-long long N, M, ret = INF, arr[300004];
+int N, M, arr[300004], l = 1, r, ret = INF;
 
-bool check(long long mid) {
-    long long num = 0;
+bool check(int mid) {
+    int cnt = 0;
     for (int i = 0; i < M; i++) {
-        num += arr[i] / mid;
-        if (arr [i] % mid) num++;
+        cnt += arr[i] / mid;
+        cnt += (arr[i] % mid ? 1 : 0);
     }
-    return N >= num;
+    return cnt <= N;
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0); cout.tie(0);
-    
+    cin.tie(0);
+
     cin >> N >> M;
-    long long lo = 1, hi = 0, mid;
     for (int i = 0; i < M; i++) {
         cin >> arr[i];
-        hi = max(hi, arr[i]);
+        r = max(r, arr[i]);
     }
-    while (lo <= hi) {
-        mid = (lo + hi) / 2;
+
+    while (l <= r) {
+        int mid = (l + r) / 2;
         if (check(mid)) {
+            r = mid - 1;
             ret = min(ret, mid);
-            hi = mid - 1;
         }
         else {
-            lo = mid + 1;
+            l = mid + 1;
         }
     }
 
-    cout << ret << "\n";
+    cout << ret << '\n';
 }
